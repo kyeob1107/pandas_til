@@ -1,0 +1,30 @@
+name: Sync Notebook to Daily Repo
+
+on:
+  push:
+    paths:
+      - 'main.ipynb' #파일이름
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Copy file to daily repository
+        env:
+          ACCESS_TOKEN: ${{ secrets.TEST1 }}
+        run: |
+          git config --global user.email "lightyear94122@gmail.com" #이메일 주소
+          git config --global user.name "data-jeong" #유저이름
+          DATE=$(date +'%Y-%m-%d')
+          cp main.ipynb $DATE.ipynb #파일이름
+          git clone https://x-access-token:${{ secrets.TEST1 }}@github.com/data-jeong/daily.git #data-jong : 유저 바꾸기
+          mv $DATE.ipynb daily/ # 리포지토리 이름 바꿔주기
+          cd daily # 리포지토리 이름 바꿔주기
+          git add $DATE.ipynb
+          git commit -m "Update notebook for $DATE"
+          git push
